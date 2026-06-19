@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Skool Community Setup Checklist — Skool Builders</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{background:#07111C;}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const {
+  useState,
+  useEffect,
+  useCallback
+} = React;
+const C = {
+  midnight: "#07111C",
+  blueprint: "#0C1A27",
+  grid: "#12324A",
+  mint: "#00F5A0",
+  mintBg: "rgba(0,245,160,0.07)",
+  mintBorder: "rgba(0,245,160,0.25)",
+  cyan: "#00C8FF",
+  cyanBg: "rgba(0,200,255,0.08)",
+  cyanBorder: "rgba(0,200,255,0.20)",
+  white: "#F7F7F2",
+  muted: "#7D8A96",
+  dimBorder: "rgba(247,247,242,0.08)",
+  dimBg: "rgba(247,247,242,0.03)",
+  paper: "#F4F3F0",
+  success: "#00F5A0",
+  successBg: "rgba(0,245,160,0.08)",
+  danger: "#FF6B6B",
+  dangerBg: "rgba(255,107,107,0.08)",
+  // Paper surface tokens — used in light content area
+  paperText: "#07111C",
+  // primary text on paper — near-black
+  paperMid: "#2A3A48",
+  // secondary text on paper — dark slate
+  paperLight: "#4A5C6A",
+  // tertiary / tip text on paper — medium slate
+  paperBorder: "rgba(7,17,28,0.10)",
+  // dividers on paper surface
+  paperRule: "rgba(7,17,28,0.08)",
+  // lighter rules between items
+  paperAlt: "#EDECEA" // slightly darker paper for do/don't panels
+};
+const SECTION_ICONS = [`<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>`, `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>`, `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`, `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>`, `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`, `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`];
+const sections = [{
+  number: "01",
+  label: "CLASSROOM",
+  title: "Set Up Your Classroom",
+  intro: "Your classroom is the backbone of your community. Keep it intentional and a little minimal. Skool is community first, so what you add to the classroom should genuinely serve your members. Less is more here.",
+  extras: [{
+    after: "c1",
+    type: "tip",
+    title: "The Start Here Rule",
+    content: "Think of your Start Here module like the reception desk of your community. Before a new member wanders into the classroom or posts in the community tab, this module should answer: What is this place? What should I do first? What are the rules? A great Start Here includes a welcome video, your community guidelines, a clear next step, and an intro prompt. If it takes more than 5 minutes to get through, it is too long."
+  }],
+  items: [{
+    id: "c1",
+    text: 'Add a "Start Here" module as the first item',
+    tip: "The single most important module in your classroom. It sets the tone, the rules, and the path forward. Every new member should land here first.",
+    hasNote: false
+  }, {
+    id: "c2",
+    text: "Include your community guidelines inside Start Here",
+    tip: "Don't bury these. Make them the first thing a new member sees inside the module. Clear guidelines from day one save you a lot of headaches later.",
+    hasNote: false
+  }, {
+    id: "c3",
+    text: "Add a completion action or next step at the end of each module",
+    tip: "Never leave a member stranded. Every module should point somewhere: the next module, the community tab, or a build session.",
+    hasNote: false
+  }]
+}, {
+  number: "02",
+  label: "CALENDAR",
+  title: "Build Your Calendar",
+  intro: "Your calendar signals how active and alive your community is. When you are just starting out, it is completely okay for the calendar to be empty. Let your community guide what you add. Start with one recurring call and build from there. Remember: anything you add to the calendar should build more community, not just fill a schedule.",
+  extras: [],
+  items: [{
+    id: "cal1",
+    text: "Decide on your live call schedule",
+    tip: "Start with one recurring call. You can always layer in more. It is much harder to take calls away than to add them.",
+    hasNote: true,
+    notePlaceholder: "Draft your initial call schedule here, e.g. Weekly build session, Tuesdays 10am AEST…"
+  }, {
+    id: "cal2",
+    text: "Add any launch or event dates (if applicable)",
+    tip: "Block these out early so members can plan ahead and you can build anticipation. Not every community will have these at launch, and that is fine.",
+    hasNote: true,
+    notePlaceholder: "List upcoming launches or events and their dates…"
+  }, {
+    id: "cal3",
+    text: "Set reminders or notifications for upcoming events",
+    tip: "Don't assume members will check the calendar. Post about sessions in the community tab too so nothing gets missed.",
+    hasNote: false
+  }]
+}, {
+  number: "03",
+  label: "COMMUNITY TAB",
+  title: "Configure Your Community Tab",
+  intro: "The community tab is where relationships are built. A little structure goes a long way. Members need to know where to post, what to share, and how to connect.",
+  extras: [{
+    after: "ct4",
+    type: "dodont",
+    title: "Community Tab",
+    dos: ["Set 4–5 clear post categories from day one", "Pin a welcome post members see immediately", "Keep posting open to all members to build momentum", "Prompt members with a specific intro question"],
+    donts: ["Leave the tab unstructured and hope for the best", "Skip the pinned post — first impressions matter", "Restrict posting to admins only at launch", "Ask a vague 'introduce yourself' with no prompt"]
+  }],
+  items: [{
+    id: "ct1",
+    text: "Pin a welcome post at the top",
+    tip: "The first thing every new member sees. Make it warm, clear, and actionable. Head to Section 04 below for exactly what to include in this post.",
+    hasNote: false
+  }, {
+    id: "ct2",
+    text: "Set your post categories",
+    tip: "4–5 categories is plenty: Wins, Questions, Resources, Introductions, and one topic-specific one. When you set your categories, you can also control who can post to each one. So if there is a category you want to keep admin-only, you can define that here rather than restricting the whole tab.",
+    hasNote: true,
+    notePlaceholder: "List your post categories here, e.g. Wins, Questions, Resources, Introductions…"
+  }, {
+    id: "ct3",
+    text: "Review your notification settings",
+    tip: "A lot of new Skool members find notifications overwhelming. You can record a short Loom video showing your members how to manage their notification preferences, and share it inside Start Here or as a pinned post. One less friction point for your members.",
+    hasNote: false
+  }, {
+    id: "ct4",
+    text: "Preview the community tab through fresh eyes",
+    tip: "You don't need to log out. Go to your About page and click the eye icon in the top right corner. This lets you view the community as a non-member or new member would see it, without any extra steps.",
+    hasNote: false
+  }]
+}, {
+  number: "04",
+  label: "WELCOME POST",
+  title: "Write Your Welcome Post",
+  intro: "Your pinned welcome post does a lot of heavy lifting. It orients new members, sets the culture, and tells them exactly what to do first. Here is a real example from Skool Builders to use as inspiration.",
+  extras: [{
+    after: "wp1",
+    type: "tip",
+    title: "Real Example: Skool Builders Welcome Post",
+    content: "You made it. Whether your Skool is live, half-built, a little messy, or feeling suspiciously quiet, you are in the right place. Skool Builders exists for one reason: to help you build a better Skool faster. Less guessing. More traction. More implementation.\n\nSTEP 1: Watch the quick Start Here walkthrough. I will show you how everything works and where to begin.\n\nSTEP 2: Introduce yourself below in the comments. Keep it simple: your name and where you are from, what you are building, what stage you are at, and your biggest current bottleneck. Examples: 'Not enough members', 'No idea what to post', 'Trying to go paid'.\n\nI can't wait to connect with you!"
+  }],
+  items: [{
+    id: "wp1",
+    text: "Write one sentence on who this community is for",
+    tip: "Be specific. Name the person and the outcome. No filler. 'This is for Skool hosts growing a paid education business' is specific. 'This is for entrepreneurs who want to grow' is not.",
+    hasNote: true,
+    notePlaceholder: "Draft your one-sentence who-it's-for statement here…"
+  }, {
+    id: "wp2",
+    text: "Tell them what to do first",
+    tip: "Link directly to your Start Here module or intro video. Remove all guesswork.",
+    hasNote: false
+  }, {
+    id: "wp3",
+    text: "Tell them where to ask questions",
+    tip: "Name the category. 'Drop your questions in the Questions category' is clearer than 'feel free to ask anything'.",
+    hasNote: false
+  }, {
+    id: "wp4",
+    text: "Tell them where to share wins",
+    tip: "Wins posts create social proof and community momentum. Make it explicit and celebrated.",
+    hasNote: false
+  }, {
+    id: "wp5",
+    text: "Include a prompt to introduce themselves",
+    tip: "Give them a specific question to answer. The more specific the prompt, the better the introductions.",
+    hasNote: true,
+    notePlaceholder: "Draft your intro prompt here…"
+  }]
+}, {
+  number: "05",
+  label: "ABOUT PAGE",
+  title: "Polish Your About Page",
+  intro: "Your about page is often the first thing a potential member reads before deciding to join. Speak to the right person, show what is inside, build trust, and tell them what to do next.",
+  extras: [{
+    after: "ap1",
+    type: "tip",
+    title: "Use the About Page Framework Tool",
+    content: "There is a dedicated About Page Framework Tool inside the Skool Builders AI Toolbox. It will walk you through writing a high-converting about page step by step, with prompts and examples built in. Use it to draft your page before you go live.",
+    url: "https://the-kyliekelly.github.io/about-page-generator/"
+  }],
+  items: [{
+    id: "ap1",
+    text: "Write a clear headline: who it's for and what they get",
+    tip: "Lead with the outcome, not the feature. 'Grow your Skool community without guesswork' is a promise. Use the About Page Framework Tool in the Skool Builders AI Toolbox to build this out properly.",
+    hasNote: true,
+    notePlaceholder: "Draft your headline here…"
+  }, {
+    id: "ap2",
+    text: "Bullet out what's inside",
+    tip: "Be specific. 'Weekly build sessions', 'Step-by-step growth blueprint', 'Private member community' beats vague claims every time.",
+    hasNote: false
+  }, {
+    id: "ap3",
+    text: "Write a short bio paragraph about who you are",
+    tip: "One paragraph. Focus on why you are the right person to lead this community.",
+    hasNote: true,
+    notePlaceholder: "Draft your bio paragraph here…"
+  }, {
+    id: "ap4",
+    text: "Add social proof if you have it",
+    tip: "Member count, member wins, testimonials. One strong quote is better than none.",
+    hasNote: false
+  }, {
+    id: "ap5",
+    text: "Write a clear CTA: what to do next",
+    tip: "One action only. Join now, apply, or book a call. Pick one and make it impossible to miss.",
+    hasNote: true,
+    notePlaceholder: "Draft your CTA here…"
+  }]
+}, {
+  number: "06",
+  label: "ONBOARDING",
+  title: "Map Your Onboarding Flow",
+  intro: "The first 24–48 hours after someone joins are the most important for retention. A clear onboarding flow means members get a win early and stay. One thing worth knowing: if you have a paid Pro Skool plan, you can connect your community to Zapier to automatically add new members to your email list. Even so, collecting emails manually via your join questions works just as well. Skool allows you to ask 3 questions when someone joins. Make at least one of them 'What is the best email address to send you resources?' and include an opt-in consent question so you have permission to email them.",
+  extras: [{
+    after: "ob6",
+    type: "dodont",
+    title: "Onboarding",
+    dos: ["Send a personal welcome DM within 24 hours", "Spotlight new member intro posts publicly", "Map out the first 7 days before you launch", "Check in at day 7 to catch disengagement early"],
+    donts: ["Rely on automation alone and never check in", "Let intro posts disappear into the feed unseen", "Wing the onboarding and hope members figure it out", "Assume no news is good news after someone joins"]
+  }],
+  items: [{
+    id: "ob1",
+    text: "Set up your join questions",
+    tip: "You can ask 3 questions when someone joins. Include: best email address for resources, an opt-in consent question, and one question about what brought them here. This keeps your email list clean and consented.",
+    hasNote: true,
+    notePlaceholder: "Draft your 3 join questions here…"
+  }, {
+    id: "ob2",
+    text: "Set up your automated welcome email",
+    tip: "Keep it short. Welcome them, tell them the one thing to do first, and link to it directly.",
+    hasNote: true,
+    notePlaceholder: "Draft your welcome email subject line and key points here…"
+  }, {
+    id: "ob3",
+    text: "Send a personal welcome DM within 24 hours",
+    tip: "Automation is great. A personal message is better.",
+    hasNote: false
+  }, {
+    id: "ob4",
+    text: "Prompt new members to post an introduction",
+    tip: "Link them directly to the Introductions category and give them the prompt from your welcome post.",
+    hasNote: false
+  }, {
+    id: "ob5",
+    text: "Pin or spotlight new member intro posts",
+    tip: "When you acknowledge a new member publicly, it signals this is a community where people are seen.",
+    hasNote: false
+  }, {
+    id: "ob6",
+    text: "Define your first-week member journey",
+    tip: "Map it out: day 1 welcome email, day 2 personal DM, day 3 nudge to Start Here. Don't leave it to chance.",
+    hasNote: true,
+    notePlaceholder: "Map your first-week journey here: Day 1, Day 2, Day 3…"
+  }, {
+    id: "ob7",
+    text: "Check in at the 7-day mark",
+    tip: "A simple 'How are you settling in?' at day 7 catches people before they disengage.",
+    hasNote: false
+  }]
+}];
+const totalItems = sections.reduce((a, s) => a + s.items.length, 0);
+function loadState() {
+  try {
+    const r = localStorage.getItem("skool_builders_checklist_v1");
+    return r ? JSON.parse(r) : {
+      checked: {},
+      notes: {}
+    };
+  } catch (e) {
+    return {
+      checked: {},
+      notes: {}
+    };
+  }
+}
+function saveState(s) {
+  try {
+    localStorage.setItem("skool_builders_checklist_v1", JSON.stringify(s));
+  } catch (e) {}
+}
+function SkoolBuilders() {
+  const [checked, setChecked] = useState({});
+  const [notes, setNotes] = useState({});
+  const [openNotes, setOpenNotes] = useState({});
+  const [openTips, setOpenTips] = useState({});
+  const [resetConfirm, setResetConfirm] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    const s = loadState();
+    setChecked(s.checked || {});
+    setNotes(s.notes || {});
+    setLoaded(true);
+  }, []);
+  const persist = useCallback((c, n) => saveState({
+    checked: c,
+    notes: n
+  }), []);
+  const toggle = id => {
+    const n = {
+      ...checked,
+      [id]: !checked[id]
+    };
+    setChecked(n);
+    persist(n, notes);
+  };
+  const updateNote = (id, v) => {
+    const n = {
+      ...notes,
+      [id]: v
+    };
+    setNotes(n);
+    persist(checked, n);
+  };
+  const resetSec = items => {
+    const c = {
+        ...checked
+      },
+      n = {
+        ...notes
+      };
+    items.forEach(i => {
+      delete c[i.id];
+      delete n[i.id];
+    });
+    setChecked(c);
+    setNotes(n);
+    persist(c, n);
+    setResetConfirm(null);
+  };
+  const resetAll = () => {
+    setChecked({});
+    setNotes({});
+    persist({}, {});
+    setResetConfirm(null);
+  };
+  const done = Object.values(checked).filter(Boolean).length;
+  const progress = Math.round(done / totalItems * 100);
+  const sp = items => {
+    const d = items.filter(i => checked[i.id]).length;
+    return {
+      done: d,
+      total: items.length,
+      pct: Math.round(d / items.length * 100)
+    };
+  };
+  const Corner = ({
+    t,
+    l,
+    r,
+    b
+  }) => /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      width: 10,
+      height: 10,
+      borderColor: `rgba(0,200,255,0.35)`,
+      borderStyle: "solid",
+      top: t !== undefined ? t : undefined,
+      left: l !== undefined ? l : undefined,
+      right: r !== undefined ? r : undefined,
+      bottom: b !== undefined ? b : undefined,
+      borderWidth: t !== undefined && l !== undefined ? "1.5px 0 0 1.5px" : t !== undefined && r !== undefined ? "1.5px 1.5px 0 0" : b !== undefined && l !== undefined ? "0 0 1.5px 1.5px" : "0 1.5px 1.5px 0"
+    }
+  });
+  const renderExtra = (ex, key) => {
+    if (ex.type === "tip") {
+      const open = openTips[key];
+      return /*#__PURE__*/React.createElement("div", {
+        key: key,
+        onClick: () => setOpenTips(p => ({
+          ...p,
+          [key]: !p[key]
+        })),
+        style: {
+          background: "rgba(0,200,255,0.06)",
+          border: `0.5px solid rgba(0,200,255,0.25)`,
+          borderRadius: 8,
+          padding: "14px 16px",
+          margin: "8px 0 12px",
+          cursor: "pointer",
+          userSelect: "none"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 10
+        }
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 9,
+          letterSpacing: "0.16em",
+          fontWeight: 700,
+          color: "#006B88",
+          background: "rgba(0,200,255,0.12)",
+          padding: "3px 8px",
+          borderRadius: 4,
+          whiteSpace: "nowrap",
+          textTransform: "uppercase"
+        }
+      }, "TIP"), /*#__PURE__*/React.createElement("span", {
+        style: {
+          flex: 1,
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 13,
+          fontWeight: 600,
+          color: C.paperText
+        }
+      }, ex.title), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 10,
+          color: "#006B88",
+          display: "inline-block",
+          transform: open ? "rotate(0deg)" : "rotate(180deg)",
+          transition: "transform .2s"
+        }
+      }, "▲")), open && /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 13,
+          lineHeight: 1.75,
+          color: C.paperMid,
+          margin: "12px 0 0",
+          paddingTop: 12,
+          borderTop: `0.5px solid rgba(0,200,255,0.2)`
+        }
+      }, ex.content.split('\n').map((line, i) => /*#__PURE__*/React.createElement("p", {
+        key: i,
+        style: {
+          margin: i > 0 ? "8px 0 0" : 0
+        }
+      }, line)), ex.url && /*#__PURE__*/React.createElement("a", {
+        href: ex.url,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        style: {
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          marginTop: 14,
+          background: "rgba(0,200,255,0.08)",
+          border: "0.5px solid rgba(0,200,255,0.25)",
+          borderRadius: 50,
+          padding: "8px 16px",
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 11,
+          fontWeight: 700,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          color: "#006B88",
+          textDecoration: "none"
+        }
+      }, "Open the tool →")), !open && /*#__PURE__*/React.createElement("p", {
+        style: {
+          fontFamily: "'Fira Code',monospace",
+          fontSize: 9,
+          color: "rgba(0,107,136,0.55)",
+          margin: "6px 0 0",
+          letterSpacing: "0.04em",
+          fontStyle: "italic"
+        }
+      }, "// click to expand"));
+    }
+    if (ex.type === "dodont") {
+      return /*#__PURE__*/React.createElement("div", {
+        key: key,
+        style: {
+          border: `0.5px solid ${C.paperBorder}`,
+          borderRadius: 8,
+          padding: "16px",
+          margin: "8px 0 12px",
+          background: C.paperAlt
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 12
+        }
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 9,
+          letterSpacing: "0.16em",
+          fontWeight: 700,
+          color: C.paperLight,
+          textTransform: "uppercase"
+        }
+      }, ex.title), /*#__PURE__*/React.createElement("div", {
+        style: {
+          flex: 1,
+          height: "0.5px",
+          background: C.paperBorder
+        }
+      })), /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 10
+        }
+      }, [{
+        items: ex.dos,
+        label: "DO THIS",
+        cls: "do"
+      }, {
+        items: ex.donts,
+        label: "NOT THIS",
+        cls: "dont"
+      }].map(col => /*#__PURE__*/React.createElement("div", {
+        key: col.cls,
+        style: {
+          background: col.cls === "do" ? "rgba(0,180,110,0.07)" : "rgba(200,60,60,0.06)",
+          border: `0.5px solid ${col.cls === "do" ? "rgba(0,180,110,0.25)" : "rgba(200,60,60,0.2)"}`,
+          borderRadius: 6,
+          padding: "13px"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 9,
+          letterSpacing: "0.16em",
+          fontWeight: 700,
+          color: col.cls === "do" ? "#005C38" : "#8B1A1A",
+          marginBottom: 10,
+          textTransform: "uppercase"
+        }
+      }, col.label), col.items.map((item, i) => /*#__PURE__*/React.createElement("div", {
+        key: i,
+        style: {
+          display: "flex",
+          gap: 8,
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 12,
+          lineHeight: 1.55,
+          color: C.paperMid,
+          marginBottom: i < col.items.length - 1 ? 8 : 0,
+          alignItems: "flex-start"
+        }
+      }, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontWeight: 700,
+          color: col.cls === "do" ? "#005C38" : "#8B1A1A",
+          minWidth: 14,
+          paddingTop: 1
+        }
+      }, col.cls === "do" ? "✓" : "✗"), /*#__PURE__*/React.createElement("span", null, item)))))));
+    }
+    return null;
+  };
+  if (!loaded) return /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: 40,
+      color: C.muted,
+      fontFamily: "'Space Grotesk',sans-serif",
+      background: C.midnight,
+      minHeight: "100vh"
+    }
+  }, "Loading…");
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      background: C.midnight,
+      minHeight: "100vh",
+      color: C.white
+    }
+  }, /*#__PURE__*/React.createElement("style", null, `
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+        * { margin:0; padding:0; box-sizing:border-box; }
+        .ci:hover { background:rgba(7,17,28,0.04); }
+        .note-ta { width:100%; border:0.5px solid rgba(7,17,28,0.2); border-radius:6px; padding:10px 12px; font-family:'Space Grotesk',sans-serif; font-size:13px; line-height:1.6; color:#07111C; resize:vertical; min-height:76px; outline:none; transition:border-color .15s; background:#fff; }
+        .note-ta::placeholder { color:#7a8a94; }
+        .note-ta:focus { border-color:#00C8FF; }
+        .rbtn { background:none; border:none; cursor:pointer; font-family:'Space Grotesk',sans-serif; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:rgba(7,17,28,0.25); padding:3px 0; transition:color .15s; font-weight:600; }
+        .rbtn:hover { color:#CC3333; }
+        .note-pill { flex-shrink:0; border-radius:50px; padding:5px 12px; cursor:pointer; font-family:'Space Grotesk',sans-serif; font-size:9px; letter-spacing:0.08em; font-weight:700; text-transform:uppercase; transition:all .15s; margin-top:2px; white-space:nowrap; }
+        @media(max-width:600px){
+          .split{flex-direction:column!important;}
+          .sbar{width:100%!important;min-width:unset!important;padding:16px 20px!important;border-right:none!important;border-bottom:0.5px solid rgba(0,200,255,0.15)!important;}
+          .sbar-in{flex-direction:row!important;align-items:center!important;gap:16px!important;}
+          .dd-grid{grid-template-columns:1fr!important;}
+        }
+      `), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.midnight,
+      position: "relative",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      backgroundImage: `linear-gradient(${C.grid} 1px,transparent 1px),linear-gradient(90deg,${C.grid} 1px,transparent 1px)`,
+      backgroundSize: "28px 28px",
+      opacity: 0.5,
+      pointerEvents: "none"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      background: `radial-gradient(ellipse at 60% 40%, rgba(0,245,160,0.06) 0%, transparent 65%)`,
+      pointerEvents: "none"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 860,
+      margin: "0 auto",
+      padding: "0 28px",
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderBottom: `0.5px solid ${C.dimBorder}`,
+      padding: "14px 0",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.16em",
+      textTransform: "uppercase",
+      color: C.cyan
+    }
+  }, "SKOOL BUILDERS"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 60,
+      height: "0.5px",
+      background: C.cyan,
+      opacity: 0.3
+    }
+  })), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Fira Code',monospace",
+      fontSize: 9,
+      color: C.muted,
+      fontStyle: "italic"
+    }
+  }, "// 6 sections · ", totalItems, " steps")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "52px 0 48px",
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement(Corner, {
+    t: 0,
+    l: 0
+  }), /*#__PURE__*/React.createElement(Corner, {
+    t: 0,
+    r: 0
+  }), /*#__PURE__*/React.createElement(Corner, {
+    b: 0,
+    l: 0
+  }), /*#__PURE__*/React.createElement(Corner, {
+    b: 0,
+    r: 0
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: "32px 24px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 8,
+      background: C.mintBg,
+      border: `0.5px solid ${C.mintBorder}`,
+      borderRadius: 4,
+      padding: "4px 12px",
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.16em",
+      color: C.mint,
+      textTransform: "uppercase"
+    }
+  }, "Community Setup Checklist")), /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontFamily: "'Sora',sans-serif",
+      fontWeight: 800,
+      fontSize: "clamp(30px,5.5vw,54px)",
+      color: C.white,
+      lineHeight: 1.05,
+      marginBottom: 8
+    }
+  }, "Build your community", /*#__PURE__*/React.createElement("br", null), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.mint
+    }
+  }, "the right way.")), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 16,
+      lineHeight: 1.75,
+      color: C.muted,
+      maxWidth: 500,
+      marginBottom: 32,
+      marginTop: 14
+    }
+  }, "Every step you need to launch your Skool community with confidence. Work through each section in order — your progress saves automatically."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.blueprint,
+      border: `0.5px solid ${C.cyanBorder}`,
+      borderRadius: 10,
+      padding: "22px 24px",
+      maxWidth: 520,
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement(Corner, {
+    t: 6,
+    l: 6
+  }), /*#__PURE__*/React.createElement(Corner, {
+    t: 6,
+    r: 6
+  }), /*#__PURE__*/React.createElement(Corner, {
+    b: 6,
+    l: 6
+  }), /*#__PURE__*/React.createElement(Corner, {
+    b: 6,
+    r: 6
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.16em",
+      textTransform: "uppercase",
+      color: C.muted
+    }
+  }, "OVERALL PROGRESS"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Sora',sans-serif",
+      fontWeight: 800,
+      fontSize: 22,
+      color: C.white
+    }
+  }, done, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 400,
+      color: C.muted
+    }
+  }, "/", totalItems))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "rgba(247,247,242,0.08)",
+      borderRadius: 99,
+      height: 5,
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: `${progress}%`,
+      height: "100%",
+      background: `linear-gradient(90deg,${C.mint},${C.cyan})`,
+      borderRadius: 99,
+      transition: "width .4s ease"
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      marginTop: 10,
+      alignItems: "center"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Fira Code',monospace",
+      fontSize: 9,
+      color: progress === 100 ? C.mint : C.muted,
+      fontStyle: "italic"
+    }
+  }, progress === 100 ? "// all done — community ready" : "// " + progress + "% complete"), /*#__PURE__*/React.createElement("button", {
+    className: "rbtn",
+    onClick: () => setResetConfirm("all")
+  }, "Reset all"))))))), resetConfirm && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.75)",
+      zIndex: 999,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.blueprint,
+      border: `0.5px solid ${C.cyanBorder}`,
+      borderRadius: 12,
+      padding: "32px",
+      maxWidth: 360,
+      width: "100%",
+      boxShadow: "0 24px 60px rgba(0,0,0,0.5)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Sora',sans-serif",
+      fontWeight: 700,
+      fontSize: 20,
+      color: C.white,
+      marginBottom: 8
+    }
+  }, "Are you sure?"), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 14,
+      color: C.muted,
+      lineHeight: 1.65,
+      marginBottom: 24
+    }
+  }, resetConfirm === "all" ? "This will clear all checkboxes and notes across every section." : "This will clear all checkboxes and notes for this section only."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => setResetConfirm(null),
+    style: {
+      flex: 1,
+      padding: "12px",
+      border: `0.5px solid ${C.dimBorder}`,
+      borderRadius: 50,
+      background: "none",
+      cursor: "pointer",
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 11,
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      fontWeight: 700,
+      color: C.muted
+    }
+  }, "Cancel"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => resetConfirm === "all" ? resetAll() : resetSec(resetConfirm),
+    style: {
+      flex: 1,
+      padding: "12px",
+      border: "none",
+      borderRadius: 50,
+      background: "#FF6B6B",
+      cursor: "pointer",
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 11,
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      fontWeight: 700,
+      color: C.midnight
+    }
+  }, "Yes, reset")))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 860,
+      margin: "0 auto",
+      padding: "32px 28px 0"
+    }
+  }, sections.map((section, idx) => {
+    const {
+      done: sd,
+      total: st,
+      pct
+    } = sp(section.items);
+    const allDone = sd === st;
+    const rows = [];
+    section.items.forEach((item, ii) => {
+      rows.push({
+        kind: "item",
+        item,
+        ii
+      });
+      section.extras.forEach(ex => {
+        if (ex.after === item.id) rows.push({
+          kind: "extra",
+          ex,
+          key: `${section.number}-${ex.after}`
+        });
+      });
+    });
+    return /*#__PURE__*/React.createElement("div", {
+      key: section.number,
+      className: "split",
+      style: {
+        display: "flex",
+        marginBottom: 20,
+        background: C.paper,
+        border: `0.5px solid ${allDone ? C.mintBorder : C.paperBorder}`,
+        borderRadius: 10,
+        overflow: "hidden",
+        transition: "all .3s",
+        boxShadow: allDone ? `0 0 0 1px rgba(0,245,160,0.2), 0 4px 20px rgba(0,245,160,0.06)` : "0 2px 12px rgba(0,0,0,0.08)"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "sbar",
+      style: {
+        width: 110,
+        minWidth: 110,
+        background: allDone ? "#0a2a1a" : C.blueprint,
+        borderRight: `1px solid ${allDone ? C.mintBorder : C.cyanBorder}`,
+        padding: "24px 16px",
+        transition: "background .3s"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "sbar-in",
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 6,
+        alignItems: "flex-start"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        color: allDone ? C.mint : C.cyan,
+        marginBottom: 4,
+        opacity: 1
+      },
+      dangerouslySetInnerHTML: {
+        __html: SECTION_ICONS[idx]
+      }
+    }), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "'Sora',sans-serif",
+        fontWeight: 800,
+        fontSize: 32,
+        color: allDone ? C.mint : C.cyan,
+        lineHeight: 1,
+        transition: "color .3s"
+      }
+    }, section.number), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "'Space Grotesk',sans-serif",
+        fontSize: 8,
+        letterSpacing: "0.16em",
+        textTransform: "uppercase",
+        color: allDone ? C.mint : C.white,
+        fontWeight: 700,
+        lineHeight: 1.4,
+        opacity: 0.85
+      }
+    }, section.label), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 12,
+        width: "100%"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        background: "rgba(247,247,242,0.15)",
+        borderRadius: 99,
+        height: 3,
+        overflow: "hidden",
+        marginBottom: 6
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: `${pct}%`,
+        height: "100%",
+        background: allDone ? C.mint : C.cyan,
+        borderRadius: 99,
+        transition: "width .4s"
+      }
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "'Fira Code',monospace",
+        fontSize: 9,
+        color: allDone ? C.mint : C.cyan,
+        letterSpacing: "0.04em",
+        opacity: 0.9
+      }
+    }, sd, "/", st)))), /*#__PURE__*/React.createElement("div", {
+      style: {
+        flex: 1,
+        padding: "22px 22px",
+        minWidth: 0
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginBottom: 14,
+        paddingBottom: 14,
+        borderBottom: `0.5px solid ${C.paperRule}`,
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        gap: 12
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "'Sora',sans-serif",
+        fontWeight: 700,
+        fontSize: "clamp(15px,2.5vw,19px)",
+        color: C.paperText,
+        lineHeight: 1.2,
+        marginBottom: 5
+      }
+    }, section.title), /*#__PURE__*/React.createElement("p", {
+      style: {
+        fontFamily: "'Space Grotesk',sans-serif",
+        fontSize: 13.5,
+        lineHeight: 1.7,
+        color: C.paperMid,
+        margin: 0
+      }
+    }, section.intro)), /*#__PURE__*/React.createElement("button", {
+      className: "rbtn",
+      style: {
+        marginTop: 4,
+        flexShrink: 0,
+        color: "rgba(7,17,28,0.25)"
+      },
+      onClick: () => setResetConfirm(section.items)
+    }, "Reset")), rows.map(row => {
+      if (row.kind === "extra") return renderExtra(row.ex, row.key);
+      const {
+        item,
+        ii
+      } = row;
+      const isChecked = !!checked[item.id];
+      const noteOpen = openNotes[item.id];
+      const isLast = ii === section.items.length - 1;
+      const nextIsExtra = section.extras.some(ex => ex.after === item.id);
+      return /*#__PURE__*/React.createElement("div", {
+        key: item.id,
+        style: {
+          borderBottom: !isLast && !nextIsExtra ? `0.5px solid ${C.paperRule}` : "none"
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "ci",
+        style: {
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 14,
+          padding: "13px 8px 13px 4px",
+          cursor: "pointer",
+          borderRadius: 6,
+          transition: "background .1s"
+        },
+        onClick: () => toggle(item.id)
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 20,
+          height: 20,
+          borderRadius: 5,
+          border: `1.5px solid ${isChecked ? "#00A870" : "rgba(7,17,28,0.25)"}`,
+          background: isChecked ? "rgba(0,168,112,0.1)" : "transparent",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+          marginTop: 2,
+          transition: "all .15s"
+        }
+      }, isChecked && /*#__PURE__*/React.createElement("svg", {
+        width: "10",
+        height: "7",
+        viewBox: "0 0 10 7",
+        fill: "none"
+      }, /*#__PURE__*/React.createElement("path", {
+        d: "M1 3L3.5 6L9 1",
+        stroke: "#00A870",
+        strokeWidth: "1.8",
+        strokeLinecap: "round",
+        strokeLinejoin: "round"
+      }))), /*#__PURE__*/React.createElement("div", {
+        style: {
+          flex: 1,
+          minWidth: 0
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 14,
+          fontWeight: isChecked ? 400 : 500,
+          color: isChecked ? C.paperLight : C.paperText,
+          textDecoration: isChecked ? "line-through" : "none",
+          lineHeight: 1.4,
+          transition: "all .15s"
+        }
+      }, item.text), item.tip && /*#__PURE__*/React.createElement("p", {
+        style: {
+          fontFamily: "'Space Grotesk',sans-serif",
+          fontSize: 12.5,
+          lineHeight: 1.6,
+          color: C.paperLight,
+          margin: "4px 0 0"
+        }
+      }, item.tip)), item.hasNote && /*#__PURE__*/React.createElement("button", {
+        className: "note-pill",
+        onClick: e => {
+          e.stopPropagation();
+          setOpenNotes(p => ({
+            ...p,
+            [item.id]: !p[item.id]
+          }));
+        },
+        style: {
+          background: noteOpen ? C.mintBg : "transparent",
+          border: `0.5px solid ${noteOpen ? C.mintBorder : "rgba(7,17,28,0.15)"}`,
+          color: noteOpen ? C.mint : C.paperLight
+        }
+      }, notes[item.id] ? "📝 note" : "+ note")), item.hasNote && noteOpen && /*#__PURE__*/React.createElement("div", {
+        style: {
+          padding: "0 8px 14px 38px"
+        },
+        onClick: e => e.stopPropagation()
+      }, /*#__PURE__*/React.createElement("textarea", {
+        className: "note-ta",
+        placeholder: item.notePlaceholder,
+        value: notes[item.id] || "",
+        onChange: e => updateNote(item.id, e.target.value),
+        style: {
+          background: "#fff",
+          border: `0.5px solid rgba(7,17,28,0.15)`,
+          color: C.paperText
+        }
+      })));
+    })));
+  })), progress === 100 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 860,
+      margin: "0 auto",
+      padding: "0 28px 32px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.blueprint,
+      border: `0.5px solid ${C.mintBorder}`,
+      borderRadius: 10,
+      padding: "40px 32px",
+      textAlign: "center",
+      position: "relative",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement(Corner, {
+    t: 10,
+    l: 10
+  }), /*#__PURE__*/React.createElement(Corner, {
+    t: 10,
+    r: 10
+  }), /*#__PURE__*/React.createElement(Corner, {
+    b: 10,
+    l: 10
+  }), /*#__PURE__*/React.createElement(Corner, {
+    b: 10,
+    r: 10
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      background: `radial-gradient(ellipse at 50% 0%, rgba(0,245,160,0.1) 0%, transparent 65%)`,
+      pointerEvents: "none"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 8,
+      background: C.mintBg,
+      border: `0.5px solid ${C.mintBorder}`,
+      borderRadius: 4,
+      padding: "4px 14px",
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.16em",
+      color: C.mint,
+      textTransform: "uppercase"
+    }
+  }, "Build complete")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Sora',sans-serif",
+      fontWeight: 800,
+      fontSize: "clamp(20px,4vw,30px)",
+      color: C.white,
+      marginBottom: 10
+    }
+  }, "Your community is ready to launch."), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 15,
+      color: C.muted,
+      lineHeight: 1.7,
+      maxWidth: 440,
+      margin: "0 auto 28px"
+    }
+  }, "You have done the work. Open the doors, invite your first builders, and let the community do what communities do."), /*#__PURE__*/React.createElement("button", {
+    style: {
+      background: C.mint,
+      color: C.midnight,
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 12,
+      fontWeight: 700,
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      padding: "14px 36px",
+      border: "none",
+      borderRadius: 50,
+      cursor: "pointer",
+      boxShadow: `3px 3px 0 #061009`
+    }
+  }, "Open the doors →")))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 860,
+      margin: "0 auto",
+      padding: "8px 28px 48px"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.blueprint,
+      position: "relative",
+      overflow: "hidden",
+      borderRadius: 10,
+      border: `0.5px solid ${C.cyanBorder}`,
+      padding: "52px 32px",
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      backgroundImage: `linear-gradient(${C.grid} 1px,transparent 1px),linear-gradient(90deg,${C.grid} 1px,transparent 1px)`,
+      backgroundSize: "28px 28px",
+      opacity: 0.45,
+      pointerEvents: "none"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "absolute",
+      inset: 0,
+      background: `radial-gradient(ellipse at 50% 100%, rgba(0,245,160,0.07) 0%, transparent 65%)`,
+      pointerEvents: "none"
+    }
+  }), /*#__PURE__*/React.createElement(Corner, {
+    t: 12,
+    l: 12
+  }), /*#__PURE__*/React.createElement(Corner, {
+    t: 12,
+    r: 12
+  }), /*#__PURE__*/React.createElement(Corner, {
+    b: 12,
+    l: 12
+  }), /*#__PURE__*/React.createElement(Corner, {
+    b: 12,
+    r: 12
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: "relative"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 20,
+      justifyContent: "center"
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    width: "14",
+    height: "14",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: C.cyan,
+    strokeWidth: "1.5",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, /*#__PURE__*/React.createElement("rect", {
+    x: "3",
+    y: "3",
+    width: "18",
+    height: "18",
+    rx: "2"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M3 9h18M9 21V9"
+  })), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.16em",
+      textTransform: "uppercase",
+      color: C.cyan
+    }
+  }, "SKOOL BUILDERS"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 40,
+      height: "0.5px",
+      background: C.cyan,
+      opacity: 0.3
+    }
+  })), /*#__PURE__*/React.createElement("h2", {
+    style: {
+      fontFamily: "'Sora',sans-serif",
+      fontWeight: 800,
+      fontSize: "clamp(22px,4vw,38px)",
+      color: C.white,
+      lineHeight: 1.1,
+      marginBottom: 14
+    }
+  }, "Skool Builders is where Skool", /*#__PURE__*/React.createElement("br", null), "hosts figure it out together."), /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 15,
+      lineHeight: 1.75,
+      color: C.muted,
+      maxWidth: 480,
+      margin: "0 auto 32px"
+    }
+  }, "A paid implementation community for hosts growing education, expertise, and membership businesses on Skool."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 10,
+      justifyContent: "center",
+      marginBottom: 36
+    }
+  }, [{
+    icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>`,
+    label: "Weekly Build Sessions"
+  }, {
+    icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+    label: "Practical growth tools"
+  }, {
+    icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+    label: "Honest feedback"
+  }, {
+    icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    label: "Real builders, not spectators"
+  }].map((f, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 8,
+      background: "rgba(0,200,255,0.08)",
+      border: `0.5px solid rgba(0,200,255,0.2)`,
+      borderRadius: 8,
+      padding: "9px 16px"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.mint
+    },
+    dangerouslySetInnerHTML: {
+      __html: f.icon
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 13,
+      fontWeight: 500,
+      color: C.white
+    }
+  }, f.label)))), /*#__PURE__*/React.createElement("a", {
+    href: "https://www.skool.com/skool-builders/about",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    style: {
+      display: "inline-block",
+      background: C.mint,
+      color: C.midnight,
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 13,
+      fontWeight: 700,
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      padding: "16px 44px",
+      border: "none",
+      borderRadius: 50,
+      cursor: "pointer",
+      boxShadow: `3px 3px 0 #061009`,
+      textDecoration: "none"
+    }
+  }, "Become a Founding Builder →"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 14,
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 11,
+      color: C.muted,
+      letterSpacing: "0.04em"
+    }
+  }, "Implementation community \xA0·\xA0 Cancel any time")))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: "#040D15",
+      borderTop: `0.5px solid ${C.dimBorder}`,
+      padding: "40px 28px 32px",
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      maxWidth: 860,
+      margin: "0 auto"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 11,
+      fontWeight: 700,
+      letterSpacing: "0.18em",
+      textTransform: "uppercase",
+      color: C.white,
+      marginBottom: 18
+    }
+  }, "KYLIE KELLY"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 28,
+      marginBottom: 24,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("a", {
+    href: "https://kyliekelly.com/",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.14em",
+      textTransform: "uppercase",
+      color: C.muted,
+      textDecoration: "none"
+    }
+  }, "KYLIEKELLY.COM"), /*#__PURE__*/React.createElement("a", {
+    href: "https://kyliekelly.com/privacy-policy",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: "0.14em",
+      textTransform: "uppercase",
+      color: C.muted,
+      textDecoration: "none"
+    }
+  }, "PRIVACY POLICY & TERMS")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: "0.5px",
+      background: C.dimBorder,
+      maxWidth: 320,
+      margin: "0 auto 20px"
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Space Grotesk',sans-serif",
+      fontSize: 11,
+      color: "rgba(125,138,150,0.55)",
+      lineHeight: 1.8
+    }
+  }, "© 2026 Kylie Kelly. All rights reserved.", /*#__PURE__*/React.createElement("br", null), "This resource is for members of Skool Builders. Educational use only, not financial or legal advice.", /*#__PURE__*/React.createElement("br", null), "By using this tool you agree to Kylie Kelly's", " ", /*#__PURE__*/React.createElement("a", {
+    href: "https://kyliekelly.com/privacy-policy",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    style: {
+      color: C.cyan,
+      textDecoration: "underline",
+      textUnderlineOffset: 2
+    }
+  }, "Terms & Conditions"), "."), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16,
+      fontFamily: "'Fira Code',monospace",
+      fontSize: 8,
+      letterSpacing: "0.04em",
+      color: "rgba(125,138,150,0.3)",
+      fontStyle: "italic"
+    }
+  }, "// progress saved locally in your browser"))));
+}
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(SkoolBuilders));
+</script>
+</body>
+</html>
